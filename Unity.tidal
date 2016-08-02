@@ -1,0 +1,85 @@
+import Sound.Tidal.OscStream
+import Sound.Tidal.Context as C
+
+let unity = Shape {
+      params = [ S "text" Nothing,
+                 I "wait" (Just 1),
+                 F "size" (Just 0.5),
+                 F "rotate" (Just 1.0),
+                 I "vertical" (Just 0),
+                 I "horizontal" (Just 0),
+                 F "z" (Just 5.0),
+                 S "figure" Nothing
+               ],
+      cpsStamp = False,
+      C.latency = 0
+      }
+    unitySlang = OscSlang {path = "/",
+                            timestamp = NoStamp,
+                            namedParams = False,
+                            preamble = []
+                           }
+    unityStream = do
+      s <- makeConnection "127.0.0.1" 5891 unitySlang
+      stream (Backend s $ (\_ _ _ -> return ())) unity
+    text       = makeS unity "text"
+    wait       = makeI unity "wait"
+    size       = makeF unity "size"
+    rotate     = makeF unity "rotate"
+    vertical   = makeI unity "vertical"
+    horizontal = makeI unity "horizontal"
+    z          = makeF unity "z"
+    figure     = makeS unity "figure"
+
+u1 <- unityStream
+
+cps 1
+
+u1 $
+  every 4 ((#figure "shroom") . (# size "2") . slow 8) $
+  sometimes (superimpose (# horizontal (sometimesBy 0.25 (fmap(*(-(1)))) "[2 5 10]/3"))) $
+  sometimes (superimpose (# vertical (sometimesBy 0.25 (fmap(*(-(1)))) "[2 5 10]/3"))) $
+  text "silly intro lovecoded with tidalcycles and unity3d"
+  # wait  "[1 5 10]/3"
+  # size (every 2 (fmap(*1.5)) $ every 4 (fmap(+2)) $ sometimes(within(0,0.25)(fmap(*2))) "[0.25 0.1 0.3 0.35]/4")
+  # horizontal "0" --[-1 -2 1 2]/4"
+  # vertical "[-5 10 -10 5]/4"
+  # z "[-10 0 5 10]/3"
+  # rotate "[5 1]/2"
+  # figure "[cube shroom shroom cube]/4"
+
+u1 $
+  sometimesBy 0.25 (# figure "shroom") $ 
+  text "silly intro lovecoded with tidalcycles and unity3d"
+  # wait  (iter 2 "0.25 1")
+  # size "[3 1]/2"
+  # vertical  "[10 -10]/2"
+  # horizontal  "0"
+  # z "0"
+  # figure "cube"
+
+u1 $
+  every 4 (within(0,0.25)((# rotate (scale 1 5 rand)) . (# figure "shroom"))) $
+  every 3 (superimpose(# rotate (scale 1 2 rand))) $
+  text "x x x x x"
+  # wait "[1 5 2]/3"
+  # z "5"
+  # rotate "0"
+  # size "[1 0.5 0.25]/3"
+  # vertical "[-1 1]/2"
+  # horizontal (iter 10 $ listToPat [1..10])
+  # figure "cube"
+
+u1 $
+  slow 4 $
+  superimpose (#horizontal "-10") $
+  text "x"
+  # wait "1"
+  # z (scale 1 10 rand)
+  # rotate (every 3 (fmap(+5)) "0")
+  # size (every 3 (within(0,0.25)(fmap (+0.25))) "0.25")
+  # vertical "0"
+  # horizontal "10"
+  # figure "cube"
+  
+u1 silence
