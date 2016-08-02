@@ -2,7 +2,8 @@
 
 This project is a *Proof of Concept*/*Boilerplate* to create [Unity 3D](https://unity3d.com/) scenes that receives OSC messages that affect `GameObjects` with the intention of livecoding visuals using [TidalCycles](http://tidalcycles.org/).
 
-<img src="http://i.imgur.com/xhz29fu.gif" width="640" height="480">
+<img src="http://i.imgur.com/xhz29fu.gif" width="640" height="480">  
+[high quality](https://www.youtube.com/watch?v=ME87BlsZ6Yc)
 
 ## How do I play with it?
 
